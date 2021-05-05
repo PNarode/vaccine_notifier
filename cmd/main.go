@@ -71,35 +71,33 @@ func check_slot(wg *sync.WaitGroup, ID int, sclient helper.SlackClient) {
 		resp.Body.Close()
 	}()
 	for {
-		today := time.Now().Format("02-01-2006")
-		disUrl := fmt.Sprintf("%s?district_id=%d&date=%s", url, ID, today)
-		req, err := http.NewRequest(http.MethodGet, disUrl, nil)
-		if err != nil {
-			fmt.Println("Failed to make HTTP call ", err)
-			time.Sleep(time.Minute * 5)
-			continue
+		today := time.Now()
+		for i := 0; i <= 5; i++ {
+			date := today.AddDate(0, 0, i).Format("02-01-2006")
+			disUrl := fmt.Sprintf("%s?district_id=%d&date=%s", url, ID, date)
+			req, err := http.NewRequest(http.MethodGet, disUrl, nil)
+			if err != nil {
+				fmt.Println("Failed to make HTTP call ", err)
+				continue
+			}
+			req.Header.Add("Content-Type", "application/json")
+			resp, err = client.Do(req)
+			if err != nil {
+				fmt.Println("Failed to make HTTP call ", err)
+				continue
+			}
+			body, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				fmt.Println("No Response Body ", err)
+				continue
+			}
+			err = json.Unmarshal(body, &respBody)
+			if err != nil {
+				fmt.Println("Error UnMarshalling Body ", err)
+				continue
+			}
+			processBody(respBody, sclient)
 		}
-		req.Header.Add("Content-Type", "application/json")
-		resp, err = client.Do(req)
-		if err != nil {
-			fmt.Println("Failed to make HTTP call ", err)
-			time.Sleep(time.Minute * 5)
-			continue
-		}
-
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			fmt.Println("No Response Body ", err)
-			time.Sleep(time.Minute * 5)
-			continue
-		}
-		err = json.Unmarshal(body, &respBody)
-		if err != nil {
-			fmt.Println("Error UnMarshalling Body ", err)
-			time.Sleep(time.Minute * 5)
-			continue
-		}
-		processBody(respBody, sclient)
 		time.Sleep(time.Minute * 5)
 	}
 }
