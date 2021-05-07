@@ -6,9 +6,9 @@ import (
 )
 
 func SendEmail(body string) {
-	from := "pratik.narode@velotio.com"
-	pass := "wqnenqzuiachflnn"
-	to := []string{"ankitadaher@gmail.com", "pratiknarode143@gmail.com", "shashanknarode133@gmail.com"}
+	from := ""
+	pass := ""
+	to := []string{""}
 
 	msg := "From: " + from + "\n" +
 		"Subject: Vaccine Notification\n\n" +
